@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:property name="PI" value="3.1415926535897931"/>
+
+    <!-- kin limits (sign ref is RH leg)-->
+    <xacro:property name="haa_max" value="2.44346095"/>
+    <xacro:property name="haa_min" value="-1.30899694"/>
+
+    <xacro:property name="hfe_max" value="1.57079633"/>
+    <xacro:property name="hfe_min" value="-3.92699082"/>
+
+    <xacro:property name="kfe_max" value="6.45771823"/>
+    <xacro:property name="kfe_min" value="-6.45771823"/>
+
+    <!-- torque limits -->
+
+    <xacro:property name="MAX_TORQUE" value="1000" />
+
+
+</robot>

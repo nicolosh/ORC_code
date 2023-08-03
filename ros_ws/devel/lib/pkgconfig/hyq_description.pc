@@ -1,0 +1,8 @@
+prefix=/home/student/ros_ws/devel
+
+Name: hyq_description
+Description: Description of hyq_description
+Version: 0.1.2
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

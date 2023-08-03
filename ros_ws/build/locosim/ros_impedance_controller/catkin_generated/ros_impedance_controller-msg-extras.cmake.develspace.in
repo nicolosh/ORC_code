@@ -1,0 +1,2 @@
+set(ros_impedance_controller_MESSAGE_FILES "/home/student/ros_ws/src/locosim/ros_impedance_controller/msg/pid.msg;/home/student/ros_ws/src/locosim/ros_impedance_controller/msg/BaseState.msg;/home/student/ros_ws/src/locosim/ros_impedance_controller/msg/ContactsState.msg;/home/student/ros_ws/src/locosim/ros_impedance_controller/msg/Forces.msg")
+set(ros_impedance_controller_SERVICE_FILES "/home/student/ros_ws/src/locosim/ros_impedance_controller/srv/set_pids.srv;/home/student/ros_ws/src/locosim/ros_impedance_controller/srv/get_map.srv")
