@@ -37,7 +37,7 @@ class Visual:
 
 class Pendulum:
     '''
-    Define a class Pendulum with nbJoint joints.
+    Define a class for a CONTINUOUS Pendulum with nbJoint joints.
     The members of the class are:
     * viewer: a display encapsulating a gepetto viewer client to create 3D objects and place them.
     * model: the kinematic tree of the robot.
@@ -117,8 +117,8 @@ class Pendulum:
     def nu(self): return self.nv
 
     def reset(self, x0=None):
-        ''' Reset the state of the environment to x0 '''
-        if x0 is None: 
+        ''' Reset the state of the SYSTEM or environment to x0 '''
+        if x0 is None: #x0 IS RANDOM If none
             q0 = np.pi*(np.rand(self.nq)*2-1)
             v0 = np.rand(self.nv)*2-1
             x0 = np.vstack([q0,v0])
@@ -127,11 +127,11 @@ class Pendulum:
         self.r = 0.0
         return self.obs(self.x)
 
-    def step(self, u):
-        ''' Simulate one time step '''
+    def step(self, u): # u scalar = torque applied to the pendulum
+        ''' Simulate one time step (into the future)'''
         assert(len(u)==self.nu)
         _,self.r = self.dynamics(self.x, u)
-        return self.obs(self.x), self.r
+        return self.obs(self.x), self.r # observation of the next state and reward which is actually a cost
 
     def obs(self, x):
         ''' Compute the observation of the state '''
@@ -177,7 +177,8 @@ class Pendulum:
             if display:
                 self.display(q)
                 time.sleep(1e-4)
-
+        
+        # max joint angle and joint velocity (between -pi and pi and between -vmax and vmax)
         x[:self.nq] = modulePi(q)
         x[self.nq:] = np.clip(v,-self.vmax,self.vmax)
         

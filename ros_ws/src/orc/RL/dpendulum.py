@@ -3,7 +3,10 @@ import numpy as np
 from numpy import pi
 import time
     
+'Dynamic programming algorithms require discrete control/action and state spaces'
 
+
+'***************** Discretization of a continuous time system ********************'
 class DPendulum:
     ''' Discrete Pendulum environment. Joint angle, velocity and torque are discretized
         with the specified steps. Joint velocity and torque are saturated. 
@@ -31,27 +34,30 @@ class DPendulum:
     @property
     def goal(self): return self.x2i(self.c2d([0.,0.]))
     
-    # Continuous to discrete
+    # Methods to switch from Continuous to discrete (positive integer values) space
     def c2dq(self, q):
-        q = (q+pi)%(2*pi)
-        return int(np.floor(q/self.DQ))  % self.nq
+        q = (q+pi)%(2*pi) #to be in range 0 and 2*pi
+        return int(np.floor(q/self.DQ))  % self.nq  # takes the closest smaller integer 
+                                                    # and the integer value will be between 0 and q-1 
+                                                    # division by self.nq should not be necessary
     
-    def c2dv(self, v):
-        v = np.clip(v,-self.vMax+1e-3,self.vMax-1e-3)
-        return int(np.floor((v+self.vMax)/self.DV))
+    def c2dv(self, v): #joint velocities saturation
+        v = np.clip(v,-self.vMax+1e-3,self.vMax-1e-3) # clip used to saturate (not uses the % to be in the desired range!!!)
+        return int(np.floor((v+self.vMax)/self.DV))  # if v > vmax then v = +vmax or if v < -vmax then v = -vmax    
     
-    def c2du(self, u):
+    
+    def c2du(self, u): #joint torques saturation
         u = np.clip(u,-self.uMax+1e-3,self.uMax-1e-3)
         return int(np.floor((u+self.uMax)/self.DU))
     
-    def c2d(self, qv):
+    def c2d(self, qv): # conversion for both joint velocity and position (qv is the vector state)
         '''From continuous to 2d discrete.'''
         return np.array([self.c2dq(qv[0]), self.c2dv(qv[1])])
     
-    # Discrete to continuous
+    # Conversion from Discrete to continuous space
     def d2cq(self, iq):
         iq = np.clip(iq,0,self.nq-1)
-        return iq*self.DQ - pi + 0.5*self.DQ
+        return iq*self.DQ - pi + 0.5*self.DQ # 0.5 is used to take the central value of the discretized grid
     
     def d2cv(self, iv):
         iv = np.clip(iv,0,self.nv-1) - (self.nv-1)/2
@@ -65,23 +71,25 @@ class DPendulum:
         '''From 2d discrete to continuous'''
         return np.array([self.d2cq(iqv[0]), self.d2cv(iqv[1])])
     
-    ''' From 2d discrete to 1d discrete '''
+    ''' From 2d discrete to 1d discrete 
+        (to have just 1 (not 2 so one for position and velocity) 
+        single integer value for encoding the state in RL)'''
     def x2i(self, x): return x[0]+x[1]*self.nq
     
     ''' From 1d discrete to 2d discrete '''
     def i2x(self, i): return [ i%self.nq, int(np.floor(i/self.nq)) ]
 
-    def reset(self,x=None):
+    def reset(self,x=None): # reset the state
         if x is None:
             self.x = np.random.randint(0,self.nx)
         else: 
             self.x = x
         return self.x
 
-    def step(self,iu):
+    def step(self,iu): # simulates the system forward of 1 time step and computes the cost
         cost     = -1 if self.x==self.goal else 0
         self.x   = self.dynamics(self.x,iu)
-        return self.x, cost
+        return self.x, cost    # cost negative better because it's something we wanna minimize
 
     def render(self):
         q = self.d2cq(self.i2x(self.x)[0])
@@ -96,7 +104,7 @@ class DPendulum:
         return self.x2i(self.c2d(self.xc))
     
     def plot_V_table(self, V):
-        ''' Plot the given Value table V '''
+        ''' Plot the given Value table V (monitoring the algorithms progress)'''
         import matplotlib.pyplot as plt
         Q,DQ = np.meshgrid([self.d2cq(i) for i in range(self.nq)], 
                             [self.d2cv(i) for i in range(self.nv)])
