@@ -1,2 +1,2 @@
 # ORC_code
-ORC code (see master branch for code developed)
+ORC code (see branch [master](https://github.com/nicolosh/ORC_code/tree/master) for code developed)
